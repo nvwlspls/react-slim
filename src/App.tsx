@@ -1,29 +1,36 @@
-import { useState } from 'react';
-import * as papaparse from 'papaparse';
+import { useEffect, useState } from "react";
+import { createClient } from '@supabase/supabase-js';
+import { Database } from './types/supabase';
 
-type AppProps = {
+  // TODO: Is there someplace to keep config variables like this?
+  // TODO: If this is something that lives in the file should it be inside the component?
+  const SUPABASE_KEY: string = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dXBveGt3ZnBrZXdib3NrcWlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE2Nzk4OTI3MjMsImV4cCI6MTk5NTQ2ODcyM30.h_1cuTN7l4ocNRk1bMDnk3h5a0HHRSDxC4yq3B7nmIU';
+  const SUPABAE_URL: string = 'https://dzupoxkwfpkewboskqif.supabase.co'
+  const supabase = createClient<Database>(SUPABAE_URL, SUPABASE_KEY);
 
-};
+function App() {
+  const [bands, setBands] = useState([]);
 
-function App(): JSX.Element {
+  useEffect(() => {
+    getBands();
+  }, []);
 
-  const [data, setData] = useState({});
-  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0ZopKDj4iCxxsYv1Y-JKSUSRCgpBlOXHOMHwoFuUx21fjOSWYGKEXZSDEz3tqptVKzCbU0zphwG0E/pub?output=csv"
+  async function getBands() {
+    const { data } = await supabase.from('bands').select('*');
+    setBands(data);
+  }
 
-  papaparse.parse(url, {
-    download: true,
-    complete: function(results) {
-      setData(results);
-      console.log("now")
-    }
-  });
 
+  // setBands1(data);
   return (
+
     <div className="App">
     <table>
   <thead>
     <tr>
-
+      { bands.map((band) => (
+        <th>{band.name}</th>
+      ))}
     </tr>
     </thead>
 
